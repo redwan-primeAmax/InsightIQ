@@ -28,8 +28,8 @@ export const WelcomePage: React.FC<WelcomePageProps> = ({ onStart }) => {
         <div className="inline-block p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-4">
           <Brain className="w-12 h-12 text-cyan-400" />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-          মস্তিষ্ক পরীক্ষা
+        <h1 className="text-5xl font-black tracking-tighter mb-2 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent italic">
+          InsightIQ
         </h1>
         <p className="text-slate-400 text-sm">
           অত্যাধুনিক কগনিটিভ ডায়াগনস্টিক প্ল্যাটফর্ম
