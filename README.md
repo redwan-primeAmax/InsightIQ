@@ -64,10 +64,24 @@ npm start
 - **AI**: Google Generative AI SDK (Gemini).
 - **Infrastructure**: Docker, GitHub Actions (CI/CD).
 
-## 📊 CI/CD Workflows
+## 🚢 Deployment (GitHub Pages)
 
-- **Deploy**: Automatically builds and pushes container images to Google Cloud Run.
-- **Optimization**: Uses high-speed cache recovery and multi-threaded bundling to ensure 10000x faster deployment pipelines.
+InsightIQ is now optimized for **GitHub Pages**. To publish:
+
+1. **GitHub Secrets**: Add `VITE_OPENROUTER_API_KEY` to your repository's **Secrets and variables > Actions**.
+2. **Push to Main**: The automated workflow will build and deploy your site.
+
+## ⚙️ Model Configuration
+
+You can change the AI model without touching the code:
+- Edit `public/model.txt` and put any OpenRouter model ID (e.g., `google/gemini-2.0-flash-001:free`, `anthropic/claude-3-haiku`).
+
+## 🛠 Tech Stack
+
+- **Frontend**: React 18, Vite, TypeScript, Tailwind CSS.
+- **AI**: OpenRouter API (Client-side integration).
+- **Deployment**: GitHub Pages via GitHub Actions.
+- **Icons**: Lucide React.
 
 ---
 *Created with precision in the AI Studio Build environment.*

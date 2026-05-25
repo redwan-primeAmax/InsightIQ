@@ -4,6 +4,7 @@ import { ScreenContainer } from '../layout/ScreenContainer';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { Brain, Star, ChevronRight, Activity, Zap, Layers, Trophy, AlertCircle, Quote } from 'lucide-react';
 import { AIReport, TelemetryData } from '../../types';
+import { computeScores } from '../../lib/score-calculator';
 import * as Icons from 'lucide-react';
 
 interface ResultPageProps {
@@ -18,17 +19,66 @@ export const ResultPage: React.FC<ResultPageProps> = ({ telemetry }) => {
   useEffect(() => {
     const analyzeData = async () => {
       try {
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ telemetry }),
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || 'এআই বিশ্লেষণ ব্যর্থ হয়েছে।');
+        const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+        if (!apiKey) {
+          throw new Error('OpenRouter API Key পাওয়া যায়নি। অনুগ্রহ করে .env ফাইলে VITE_OPENROUTER_API_KEY সেট করুন।');
         }
-        setReport(data);
+
+        // Fetch config from public folder
+        const [modelRes, promptRes] = await Promise.all([
+          fetch('/model.txt'),
+          fetch('/analysis_prompt.txt')
+        ]);
+
+        const modelName = (await modelRes.text()).trim() || 'google/gemini-2.0-flash-001:free';
+        const promptTemplate = await promptRes.text();
+
+        const computedScores = computeScores(telemetry);
+        const isAllSkipped = Object.values(computedScores).every(score => score === 0);
+        const totalScoreSum = Object.values(computedScores).reduce((a, b) => a + b, 0);
+        const avgScore = totalScoreSum / 6;
+
+        const finalPrompt = promptTemplate
+          .replace(/{{telemetry}}/g, JSON.stringify(telemetry))
+          .replace(/{{computedScores}}/g, JSON.stringify(computedScores));
+
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': window.location.origin,
+            'X-Title': 'InsightIQ',
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [
+              { role: 'user', content: finalPrompt }
+            ],
+            response_format: { type: 'json_object' }
+          }),
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'OpenRouter API কল ব্যর্থ হয়েছে।');
+        }
+
+        const aiContent = data.choices[0].message.content;
+        const parsed = JSON.parse(aiContent);
+
+        // Forcefully overwrite scores and percentile to align exactly with programmatic validation
+        parsed.neuralArchitecture = computedScores;
+        if (isAllSkipped) {
+          parsed.percentile = 0.0;
+        } else {
+          parsed.percentile = parseFloat(Math.min(99.9, Math.max(1.0, avgScore * 0.95 + 10)).toFixed(1));
+        }
+
+        setReport(parsed);
       } catch (err: any) {
+        console.error('Analysis error:', err);
         setError(err.message || 'এআই বিশ্লেষণ ব্যর্থ হয়েছে। অনুগ্রহ করে পুনরায় চেষ্টা করুন।');
       } finally {
         setLoading(false);
