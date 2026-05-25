@@ -25,9 +25,10 @@ export const ResultPage: React.FC<ResultPageProps> = ({ telemetry }) => {
         }
 
         // Fetch config from public folder
+        const baseUrl = import.meta.env.BASE_URL;
         const [modelRes, promptRes] = await Promise.all([
-          fetch('/model.txt'),
-          fetch('/analysis_prompt.txt')
+          fetch(`${baseUrl}model.txt`),
+          fetch(`${baseUrl}analysis_prompt.txt`)
         ]);
 
         const modelName = (await modelRes.text()).trim() || 'google/gemini-2.0-flash-001:free';
