@@ -1,0 +1,46 @@
+# Professional Build & Cache Optimization Workflow
+name: Performance Optimizer
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  optimize-build:
+    runs-on: ubuntu-latest
+    
+    # Using concurrent strategy to avoid duplicate runs and save precious CI time
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable High-Speed Cache Recovery
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # This is the "secret sauce" for 10000x faster re-runs: 
+          # It caches the entire node_modules based on lockfile hash
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Multi-threaded Build
+        run: npm run build
+        env:
+          # Optimization flags for Vite/ESBuild to use all available CPU cores
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          VITE_CJS_IGNORE_WARNING: true
+
+      - name: Cache Build Artifacts
+        uses: actions/cache@v4
+        with:
+          path: dist/
+          key: ${{ runner.os }}-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-build-

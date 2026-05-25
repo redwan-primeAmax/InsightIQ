@@ -1,0 +1,6 @@
+{
+  "name": "InsightIQ",
+  "description": "একটি আল্ট্রা-প্রিমিয়াম এবং বৈজ্ঞানিক ব্রেন ট্রেনিং অ্যাপ যা আপনার কগনিটিভ ক্ষমতা বিশ্লেষণ করে একটি বিস্তারিত এআই রিপোর্ট প্রদান করে।",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

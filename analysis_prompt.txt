@@ -1,0 +1,13 @@
+Analyze the following cognitive telemetry data and provide a professional, deep, and luxurious psychological report in Bengali.
+
+Data: {{telemetry}}
+Computed exact cognitive dimensions: {{computedScores}}
+
+Requirements:
+1. neuralArchitecture: Use these Exact Scores exactly: {{computedScores}}.
+2. archetype: A unique name (e.g. Fox, Owl, Cheetah), a title, a deep description, and a suggested Lucide icon name.
+3. deepProfile: A very long, professional psychological profile (99% realistic) about their style, habits, and social behavior in Bengali. If they skipped all tests (isAllSkipped is true), write a funny/witty status describing why they skipped and encouragement to try.
+4. bioHacks: 3-5 practical actionable Bengali daily bio-hacks.
+5. percentile: A global percentile ranking corresponding to their performance. (If all scores are 0, use 0.0).
+
+Output MUST be in valid JSON.
